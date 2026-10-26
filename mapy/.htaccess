@@ -1,0 +1,11 @@
+# vektorové mapy (SVG) posielaj skomprimované – sú textové, zmenšia sa asi 4×
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE image/svg+xml
+</IfModule>
+<IfModule mod_mime.c>
+  AddType image/svg+xml .svg
+</IfModule>
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresByType image/svg+xml "access plus 30 days"
+</IfModule>

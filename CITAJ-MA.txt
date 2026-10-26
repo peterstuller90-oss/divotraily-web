@@ -1,0 +1,111 @@
+DIVOTRAILY – nahratie na Websupport
+===================================
+0. TAJNÉ NASTAVENIA: na serveri skopíruj config.sample.php ako config.php a vyplň ho
+   (heslá rolí, TAJNY_KLUC aspoň 32 znakov, SMTP heslo). Bez config.php sa nedá prihlásiť.
+   config.php nikdy nedávaj do gitu.
+1. Celý obsah priečinka nahraj do koreňa webu (public_html / web).
+   Musí tam byť: index.html, api.php a priečinky img/, mapy/, pdf/, data/, uploads/.
+2. Priečinky data/ a uploads/ musia byť zapisovateľné pre PHP (práva 755 alebo 775).
+   - data/    – zápisy z brigád, obsah z redakcie (content.json), prihlášky členov.
+                Súbor data/.htaccess zakazuje ich čítanie zvonku – nemaž ho.
+   - uploads/ – obrázky a PDF nahraté v redakcii. Súbor uploads/.htaccess
+                blokuje spúšťanie skriptov – nemaž ho.
+
+PRIHLÁSENIE (ikonka 👤 hore v lište)
+3. Tri roly – heslá nastavíš v config.php ('ucty'):
+   Všetky roly môžu nahrať plán brigád z Excelu.
+   - brigada   → všetko okolo brigád: termíny a info, zápis účasti,
+                                    export účasti do Excelu, promo designer.
+   - admin     → texty, obrázky a informácie: režim úprav na stránke,
+                                    úvod a novinky, Združenie, Merch (aj sklad z Excelu),
+                                    texty trailov, mapy (PDF), registrácie členov.
+   - designer  → úplne všetko: navyše obťahovanie trailov na mape,
+                                    RZP body, zálohy a info pre testerov.
+   Oprávnenia kontroluje aj server (api.php), nielen web. Kľúč 'tajny_kluc' v config.php musí mať aspoň 32 znakov.
+   Po zmene hesla sa všetci musia prihlásiť znova.
+
+PRIHLÁŠKY ČLENOV → divo@divozdruzenie.sk
+4. Aby prihlášky spoľahlivo chodili do mailu, v api.php hore nastav SMTP:
+   - na Websupporte si vytvor schránku na doméne webu, napr. web@divotraily.sk
+   - v config.php daj túto adresu do 'smtp_user' a jej heslo do 'smtp_pass'
+     (ODOSIELATEL v api.php hore musí byť tá istá adresa)
+   Bez hesla sa skúsi PHP mail(), a ak zlyhá, záložne služba FormSubmit.co.
+   Pri prvom odoslaní cez FormSubmit príde na divo@divozdruzenie.sk e-mail
+   „Activate Form“ – treba raz kliknúť na potvrdenie.
+5. Po nahratí pošli skúšobnú prihlášku a over, že prišla a je v prehľade registrácií.
+
+ÚPRAVY PRIAMO NA STRÁNKE
+- Admin alebo Designer → 👤 → „Upraviť čokoľvek na stránke“ → klikni na text, tlačidlo, odkaz,
+  obrázok, trail či mapu. Všetko sa ukladá na hosting do data/content.json.
+- Pred každým uložením sa automaticky uloží záloha (data/backup/, posledných 40).
+  Vrátiť sa dá cez 👤 → „Zálohy a história“ (rola Designer).
+
+PLÁN BRIGÁD Z EXCELU (všetky roly)
+- 👤 → „Plán brigád z Excelu“ → „Stiahnuť aktuálny plán (vzor)“ → uprav v Exceli
+  (Dátum, Čas zrazu, Čo sa bude robiť, Vedúci, Miesto zrazu, Poznámka, Zrušená = áno)
+  → „Nahrať Excel s plánom“ → skontroluj náhľad → „Uložiť a aktualizovať web“.
+- Mesiace, ktoré sú v Exceli, sa nahradia; ostatné termíny ostanú. Viac riadkov v jednom
+  mesiaci = mimoriadne brigády. Funguje .xlsx a .csv (starý .xls ulož ako .xlsx).
+
+MERCH – SKLAD Z EXCELU
+- Admin/Designer → 👤 → Merch → „Nahrať Excel“ (.xlsx alebo .csv, stĺpce Produkt, Veľkosť,
+  Počet ks; vzor stiahneš tlačidlom „Stiahnuť vzor“) → Uložiť. Web pri produkte ukáže
+  „Skladom: S · M · L“ alebo „Momentálne vypredané“. Pri zmene skladu nahraj nový Excel.
+- Tlačidlo „Opýtať sa na dostupnosť“ otvorí e-mail na divo@divozdruzenie.sk s názvom produktu.
+
+INFO PRE TESTEROV
+- Na začiatku každej sekcie je box „info pre testerov“. Pred spustením pre verejnosť ho
+  vypni: Designer → 👤 → „Info pre testerov“.
+
+ZÁLOHA
+6. Všetko, čo sa mení cez web, je v priečinkoch data/ a uploads/.
+   Pri zálohovaní alebo sťahovaní webu si stiahni aj tieto dva priečinky.
+   Pri nahrávaní novej verzie webu ich NEPREPISUJ (nahraj len index.html, api.php a CITAJ-MA.txt).
+   V tejto verzii nahraj navyše priečinok game/ a súbory mapy/web-mapa-* (nové).
+
+VEKTOROVÉ MAPY
+7. V priečinku mapy/ sú aj ostré vektorové mapy (*.svg) pre obťahovač trás a súbor
+   mapy/.htaccess (zapína kompresiu SVG). Pri prvom nahratí tejto verzie nahraj aj ich.
+
+HRA „HRAJ DIVO HRU!“ (minca vľavo dole)
+8. Hra Divočiak je v priečinku game/ (game/index.html + game/assets/). Otvorí sa v okne nad webom.
+   Pred hrou hráč zadá meno (1–20 znakov), po hre sa výsledok sám zapíše do rebríčka.
+   Rebríček je spoločný pre všetkých – ukladá sa na serveri do data/scores.json
+   (každý hráč = jeden riadok s najlepším výsledkom; poradie podľa bodov, pri rovnosti vyhráva skorší výsledok).
+   Vymazanie rebríčka: zmaž súbor data/scores.json. Ochrana: najviac 20 zápisov za 10 minút z jednej IP.
+   Hra potrebuje internet na knižnicu three.js (cdnjs) a písmo Pixelify Sans (Google Fonts).
+
+NEPREJAZDNÝ TRAIL
+9. Admin alebo designer: Traily → vyber trail → „Označiť ako neprejazdný“ → Uložiť.
+   Na karte trailu sa zobrazí červený pás AKTUÁLNE NEPREJAZDNÝ. Trasa na mape sa nemení. Zrušíš to odškrtnutím.
+
+MERCH – PRODUKTY
+10. Merch → Produkty: Pridať / Zmazať (potvrdenie) / poradie šípkami. Pri produkte: názov (povinný), cena, popis,
+    odkaz (napr. e-shop) a vlastný obrázok. Vlastný obrázok nahradí výrez z náhľadu, bez neho sa použije
+    rámik označený na náhľade. Produkt bez obrázka a bez rámika sa neuloží.
+
+MAPY A A B V INTERAKTÍVNEJ MAPE
+11. Interaktívna mapa trailov používa pre zóny A a B webové verzie máp (mapy/web-mapa-home-les.jpg/.svg,
+    mapy/web-mapa-rochnisko.jpg/.svg). Na stiahnutie (sekcia Mapy) zostávajú pôvodné PDF s popisom trailov.
+    Trasy obtiahnuté skôr na starých mapách A/B sa prepočítajú automaticky.
+
+ZVUK HRY
+12. Krochkanie a kvičanie v hre sú skutočné nahrávky prasiat s licenciou CC0 (voľné dielo, bez povinnosti uvádzať autora):
+    freesound.org – tompallant (257858), felix.blume (158746), TheAcidRomance (260640); výber z datasetu ESC-50.
+    Súbor: game/assets/prasa.mp3
+
+13. GALÉRIA
+   - Nová sekcia „Galéria“ (menu Galéria, adresa #/galeria). Upravuje sa v redakcii: ikonka 👤 → Galéria
+     (rola admin alebo designer), alebo v režime úprav klikom na galériu.
+   - Položka je obrázok (JPG, PNG, WebP, GIF, najviac 20 MB) alebo video z YouTube (vlož odkaz
+     youtube.com/watch?v=…, youtu.be/…, /shorts/…). Uloží sa iba overené ID videa, prehrávač je
+     youtube-nocookie.com. Obrázky sa ukladajú do priečinka uploads/, pri uložení sa vytvorí
+     zmenšený náhľad (max. 720 px) a uloží sa pomer strán – mriežka obrázky neoreže.
+   - Veľkosť každého nadpisu a textu v redakcii aj v Promo designeri sa dá meniť plynulo od 10 %.
+
+
+GITHUB VERZIA (26. 10. 2026)
+- Bez osobných údajov a dát servera: data/ a uploads/ obsahujú len .htaccess.
+- Heslá a kľúče sú v config.php (vzor config.sample.php), nie v api.php.
+- Obsah z redakcie, brigády, prihlášky a rebríček sú v balíku pre hosting
+  (divotraily-web-2026-10-24.zip) – na server ich nahraj zvlášť, do gitu nepatria.

@@ -1,0 +1,12 @@
+# tajné nastavenia servera
+config.php
+# dáta servera (osobné údaje, zápisy, zálohy)
+data/*
+!data/.htaccess
+# nahraté súbory z redakcie
+uploads/*
+!uploads/.htaccess
+# systém
+.DS_Store
+Thumbs.db
+*.lock
